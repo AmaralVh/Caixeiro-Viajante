@@ -1,125 +1,82 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "lista.h"
 
-typedef struct no no_t;
+typedef struct vizinho_v { 
+	item *cidade;         // vizinho
+    int distancia;		  // distancia do vizinho ate a cidade
+} vizinho;
 
-struct no {
-	item_t *cidade;
-	item_t *peso_cidade;
-	no_t *prox;
+struct lista_t {
+	item *cidade;         // cidade 
+    vizinho vizinhos[12];    // vetor de vizinhos dessa cidade
+	int totalVizinhos;    // total de vizinhos dessa cidade
 };
 
-struct lista {
-	no_t *ini, *fim;
-	int total;
-};
 
-lista_t *cria_lista() {
-	lista_t *l = (lista_t *)malloc(sizeof(lista_t));
-	assert(l != NULL);
-	l->ini = NULL;
-	l->fim = NULL;
-	l->total = 0;
+lista *cria_lista(int quantidade) {
+    lista *l = (lista *)malloc((quantidade+1) * sizeof(lista));
+	if (l == NULL) {
+		return NULL;
+	}
+
+	for(int i = 1; i <= quantidade; i++) {
+		l[i].cidade = criar_item(i);
+		l[i].totalVizinhos = 0;
+	}
+
 	return l;
 }
 
-void libera_lista(lista_t **l) {
-	assert(*l != NULL);
-	no_t *p;
-	
-	p = (*l)->ini;
-	while(p != NULL) {
-		(*l)->ini = (*l)->ini->prox;
-		apagar_item(&(p->cidade));
-		apagar_item(&(p->peso_cidade));
-		free(p);
-		p = (*l)->ini;
+void insere_vizinho(lista *l, item *cidade1, item *cidade2, int distancia) {
+	if (l == NULL) {
+		exit(1);
 	}
-	(*l)->fim = NULL;
-	
-	free(*l);
-	*l = NULL;
+	int i1 = get_valor(cidade1);
+	int i2 = get_valor(cidade2);
+
+	//adicionando no total de vizinhos
+	l[i1].totalVizinhos++;
+	l[i2].totalVizinhos++;
+	int totVizinhos1 = l[i1].totalVizinhos;
+	int totVizinhos2 = l[i2].totalVizinhos;
+
+	//colocando id do vizinho
+	l[i1].vizinhos[totVizinhos1].cidade = cidade2;
+	l[i1].vizinhos[totVizinhos1].distancia = distancia;
+	l[i2].vizinhos[totVizinhos2].cidade = cidade1;
+	l[i2].vizinhos[totVizinhos2].distancia = distancia;
+
 }
 
-void insere(lista_t *l, item_t *x, item_t *y) {
-	assert(l != NULL);
-	no_t *p = (no_t *)malloc(sizeof(no_t));
-	assert(p != NULL);
-	p->cidade = x;
-	p->prox = NULL;
-	if(l->ini == NULL) { //lista esta vazia
-		p->peso_cidade = 0;
-		l->ini = p;
-	} else { //lista com pelo menos um elemento
-		p->peso_cidade = y;
-		l->fim->prox = p;
+item *get_cidade(lista *l, int i) {
+	if (l == NULL) {
+		return NULL;
 	}
-	l->fim = p;
-	l->total++;
+
+	return l[i].cidade;
 }
 
-int tamanho(lista_t *l) {
-	assert(l != NULL);
-	return l->total;
+int get_totVizinho(lista *l,int i) {
+	if (l == NULL) {
+		exit (1);
+	}
+
+	return l[i].totalVizinhos;
 }
 
-bool esta_na_lista(lista_t *l, elem x) {
-	assert(l != NULL);
-	no_t *p = l->ini;
-	while(p != NULL) {
-		if(get_valor(p->cidade) == x)
-			return true;
-		p = p->prox;
+item *get_vizinhos(lista *l, int i, int j) {
+	if (l == NULL) {
+		exit(1);
 	}
-	return false;
-}
-/*
-void imprimir(lista_t *l) {
-	assert(l != NULL);
-	no_t *p = l->ini;
-	
-	while(p != NULL) {
-		printf("%d ", get_valor(p->cidade));
-		p = p->prox;
-	}
-	printf("\n");
-}
-*/
 
-void remover(lista_t *l, elem x) {
-	assert(l != NULL);
-	no_t *p = l->ini;
-	no_t *ant = NULL;
-	
-	while(p != NULL && get_valor(p->cidade) != x) {
-		ant = p;
-		p = p->prox;
-	}
-	
-	//1o. caso: elemento nao encontrado
-	if(p == NULL) {
-		return;
-	}
-	
-	//2o. caso: elemento encontrado eh o primeiro da lista
-	if(ant == NULL) {
-		l->ini = p->prox;				
-		if(l->total == 1)
-			l->fim = NULL;
-	} else if(p == l->fim) { //3o. caso: elemento encontrado eh o ultimo da lista
-		ant->prox = NULL;
-		l->fim = ant;
-	} else { //4o. caso: elemento encontrado esta no meio da lista
-		ant->prox = p->prox;
-	}
-	
-	apagar_item(&(p->cidade));
-	apagar_item(&(p->peso_cidade));
-	free(p);		
-	l->total--;
+	return l[i].vizinhos[j].cidade;
 }
 
+int get_distancia(lista *l, int i, int j) {
+	if (l == NULL) {
+		exit(1);
+	}
 
-
+	return l[i].vizinhos[j].distancia;
+}
