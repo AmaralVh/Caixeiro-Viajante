@@ -2,6 +2,7 @@
 #define _LISTA_H
 
 #include "item.h"
+#include "pilha.h"
 
 
 typedef struct lista_t lista;
@@ -19,5 +20,11 @@ int get_totVizinho(lista *l,int i);
 item *get_vizinhos(lista *l, int i, int j);
 
 int get_distancia(lista *l, int i, int j);
+
+void forca_bruta(lista *l, int inicial, int quantidade);
+
+int cidade_atual(pilha *visitados);
+
+void percorre(lista *l, pilha *visitados, int **melhor_caminho, int *distancia, int *menor_distancia, int inicial, int quantidade, int atual);
 
 #endif
