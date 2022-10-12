@@ -3,12 +3,13 @@
 #include "lista.h"
 #include "pilha.h"
 
-
+// Struct de cada vizinho:
 typedef struct vizinho_v { 
 	item *cidade;         // vizinho
     int distancia;		  // distancia do vizinho ate a cidade
 } vizinho;
 
+// Struct de cada cidade:
 struct lista_t {
 	item *cidade;         // cidade 
     vizinho vizinhos[12]; // vetor de vizinhos dessa cidade
@@ -34,6 +35,24 @@ lista *cria_lista(int quantidade) {
 	return l;
 }
 
+
+void exclui_lista(lista **l, int quantidade) {
+	if((*l) == NULL) {
+		exit(1);
+	}
+
+	for(int i = 1; i <= quantidade; i++) {
+		for(int j = 1; j <= l[i]->totalVizinhos; i++) {
+			apagar_item(&(l[i]->vizinhos[j].cidade));
+		}
+		apagar_item(&(l[i]->cidade));
+	}
+
+	free(*l);
+	*l = NULL;
+}
+
+
 void insere_vizinho(lista *l, item *cidade1, item *cidade2, int distancia) {
 	if (l == NULL) {
 		exit(1);
@@ -50,7 +69,7 @@ void insere_vizinho(lista *l, item *cidade1, item *cidade2, int distancia) {
 	int totVizinhos2 = l[i2].totalVizinhos;
 
 	// Define os novos vizinhos para cada uma das cidades
-	// (repare que uma e vizinha da outra, isto e, relacao mutua)
+	// (repare que uma eh vizinha da outra, isto e, relacao mutua)
 	// e tambem define a distancia entre esses vizinhos:
 	l[i1].vizinhos[totVizinhos1].cidade = cidade2;
 	l[i1].vizinhos[totVizinhos1].distancia = distancia;
@@ -59,46 +78,6 @@ void insere_vizinho(lista *l, item *cidade1, item *cidade2, int distancia) {
 
 }
 
-item *get_cidade(lista *l, int i) {
-	if (l == NULL) {
-		return NULL;
-	}
-
-	return l[i].cidade;
-}
-
-int get_totVizinho(lista *l,int i) {
-	if (l == NULL) {
-		exit (1);
-	}
-
-	return l[i].totalVizinhos;
-}
-
-item *get_vizinhos(lista *l, int i, int j) {
-	if (l == NULL) {
-		exit(1);
-	}
-
-	return l[i].vizinhos[j].cidade;
-}
-
-int get_distancia(lista *l, int i, int j) {
-	if (l == NULL) {
-		exit(1);
-	}
-
-	return l[i].vizinhos[j].distancia;
-}
-
-int retornou_inicio(int totalViajado, int quantidade) {
-	if(totalViajado == quantidade) {
-
-	}
-	else {
-		return 0;
-	}
-}
 
 //transformando saida em int
 int cidade_atual(pilha *visitados){
@@ -109,6 +88,7 @@ int cidade_atual(pilha *visitados){
 
 	return i;
 }
+
 
 void percorre(lista *l, pilha *visitados, int **melhor_caminho, int *distancia, int *menor_distancia, int inicial, int quantidade, int atual){
 	int vizinho = 1;
@@ -141,6 +121,7 @@ void percorre(lista *l, pilha *visitados, int **melhor_caminho, int *distancia, 
 	return;
 }
 
+
 void forca_bruta(lista *l, int inicial, int quantidade) {
 	pilha *visitados;
 	int *melhor_caminho; 
@@ -153,6 +134,9 @@ void forca_bruta(lista *l, int inicial, int quantidade) {
 	melhor_caminho = (int*) malloc((quantidade+1) * sizeof(int));
 
 	percorre(l, visitados, &melhor_caminho, &distancia, &menor_distancia, inicial, quantidade, inicial);
+
+	destruir_pilha(&visitados);
+	// exclui_lista(&l, quantidade);
 
 	printf("%d ", inicial);
 	for(int i = 1; i <= quantidade; i++) {
