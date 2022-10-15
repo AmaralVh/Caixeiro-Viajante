@@ -83,6 +83,7 @@ void destruir_pilha(pilha **p) {
 //funcao verificando se cidade ja foi passada
 int contem(pilha*p, item *x){
 	for(int i = 0; i <= p->topo; i++) {
+		// comparando
 		if(get_valor(x) == get_valor(p->itens[i])) {
 			return 1;
 		}
@@ -91,10 +92,10 @@ int contem(pilha*p, item *x){
 	return 0;
 }
 
+// transformando pilha de melhor caminho em vetor
 int *pilha_vetor(pilha *visitados) {
 	int *vetor = (int *) malloc(sizeof(int) * (tam_pilha(visitados) + 1));
 	int i = tam_pilha(visitados);
-	int quantidade = i; // apagar isso dps
 
 	for(int i = 0; i <= visitados->topo; i++) {
 		vetor[i+1] = get_valor(visitados->itens[i]);
